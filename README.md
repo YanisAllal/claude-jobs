@@ -60,7 +60,7 @@ titres hors sujet…). Tu n'as rien à régler.
 
 **1. Télécharge le projet et installe-le**
 ```sh
-git clone https://github.com/<ton-compte>/claude-jobs.git
+git clone https://github.com/YanisAllal/claude-jobs.git
 cd claude-jobs
 ./installer.sh
 ```
