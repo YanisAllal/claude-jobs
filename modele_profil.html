@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon profil</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;
+    --accent: #2f5bea; --good: #1f8a4c; --mid: #b7791f; --bad: #c0392b; --chip: #efefea; --warn-bg: #fff4d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151514; --surface: #1e1e1c; --text: #ececea; --muted: #9a9a94; --line: #2f2f2c;
+            --accent: #7b9bff; --good: #4cc483; --mid: #e0a84a; --bad: #ef6b5c; --chip: #2a2a27; --warn-bg: #3a3020; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 16px 16px 120px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1 { font-size: 22px; margin: 12px 0 4px; }
+  .intro { color: var(--muted); margin: 0 0 16px; }
+  .carte { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin-top: 16px; }
+  .carte h2 { font-size: 15px; margin: 0 0 2px; }
+  .carte .aide { color: var(--muted); font-size: 12.5px; margin: 0 0 8px; }
+  .grille { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  @media (max-width: 640px) { .grille { grid-template-columns: 1fr; } }
+  label.champ { display: block; font-size: 12.5px; font-weight: 600; margin: 12px 0 4px; }
+  label.champ small { font-weight: 400; color: var(--muted); }
+  input, select, textarea { width: 100%; background: var(--surface); color: var(--text); border: 1px solid var(--line);
+                            border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 13.5px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent); border-color: var(--accent); }
+  input[type="checkbox"] { width: auto; accent-color: var(--accent); }
+  input[type="color"] { padding: 2px; height: 36px; }
+  textarea { min-height: 92px; resize: vertical; }
+  textarea.cv { min-height: 420px; font: 12.5px/1.5 ui-monospace, Menlo, monospace; }
+  .cases { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 4px; }
+  .cases label { display: inline-flex; gap: 6px; align-items: center; font-size: 13.5px; }
+  .diag { list-style: none; padding: 0; margin: 0; }
+  .diag li { padding: 6px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 22px 1fr; gap: 4px; }
+  .diag li:last-child { border-bottom: 0; }
+  .diag small { display: block; color: var(--muted); }
+  .barre { position: fixed; bottom: 0; left: 0; right: 0; background: color-mix(in srgb, var(--bg) 92%, transparent);
+           backdrop-filter: blur(6px); border-top: 1px solid var(--line); padding: 10px 16px; }
+  .barre div { max-width: 860px; margin: 0 auto; display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+  .barre .etat { margin-right: auto; color: var(--muted); font-size: 13px; }
+  .btn { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 8px; padding: 8px 14px;
+         font: inherit; cursor: pointer; }
+  .btn.primaire { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .note { background: var(--chip); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--muted); margin-top: 12px; }
+  .note code { background: var(--surface); padding: 1px 6px; border-radius: 4px; color: var(--text); }
+  .erreur { color: var(--bad); }
+  details summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+  details[open] summary { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <a href="/">← Tableau de bord</a>
+  <h1>Mon profil</h1>
+  <p class="intro">Ces réponses servent à chercher les offres, à les noter et à rédiger tes candidatures. Une ligne par élément
+    dans les listes. Tu peux tout changer plus tard. Préfères-tu répondre à des questions ? Ouvre Claude Code dans le dossier du
+    projet et tape <code>/configurer</code> : Claude lit ton CV et remplit cette page pour toi.</p>
+  <div class="note" id="demo" hidden>Tu es dans la démo (profil fictif) : rien ne sera enregistré. Lance <code>./jobs serveur</code> pour ton propre profil.</div>
+
+  <section class="carte">
+    <h2>État de l'installation</h2>
+    <ul class="diag" id="diag"></ul>
+  </section>
+
+  <section class="carte">
+    <h2>1. Qui es-tu ?</h2>
+    <p class="aide">Écrit en haut du CV et des lettres.</p>
+    <div class="grille">
+      <div><label class="champ" for="nom">Prénom et nom *</label><input id="nom" data-chemin="profil.nom" autocomplete="name" placeholder="Camille Martin"></div>
+      <div><label class="champ" for="email">E-mail</label><input id="email" type="email" data-chemin="profil.email" autocomplete="email"></div>
+      <div><label class="champ" for="tel">Téléphone</label><input id="tel" data-chemin="profil.telephone" autocomplete="tel"></div>
+      <div><label class="champ" for="ville">Ville où tu habites</label><input id="ville" data-chemin="profil.ville" placeholder="Lyon"></div>
+      <div><label class="champ" for="linkedin">Profil LinkedIn <small>(facultatif)</small></label><input id="linkedin" data-chemin="profil.linkedin" placeholder="linkedin.com/in/…"></div>
+      <div><label class="champ" for="accroche">Accroche du CV <small>(une ligne)</small></label><input id="accroche" data-chemin="profil.accroche" placeholder="Jeune diplômée en contrôle de gestion, à l'aise avec Excel et Power BI"></div>
+    </div>
+  </section>
+
+  <section class="carte">
+    <h2>2. Quel poste cherches-tu ?</h2>
+    <div class="grille">
+      <div><label class="champ" for="postes">Postes visés <small>(un par ligne)</small></label>
+        <textarea id="postes" data-chemin="postes_vises" data-type="liste" placeholder="Contrôleur de gestion&#10;Analyste financier"></textarea></div>
+      <div><label class="champ" for="secteurs">Secteurs préférés <small>(bonus dans la note)</small></label>
+        <textarea id="secteurs" data-chemin="secteurs_preferes" data-type="liste" placeholder="Santé&#10;Énergie"></textarea></div>
+      <div><label class="champ" for="niveau">Ton niveau</label>
+        <select id="niveau" data-chemin="experience.niveau">
+          <option value="debutant">Débutant (jeune diplômé, stages ou alternance)</option>
+          <option value="junior">Junior (1 à 3 ans)</option>
+          <option value="confirme">Confirmé (3 à 7 ans)</option>
+          <option value="senior">Senior (plus de 7 ans)</option>
+        </select></div>
+      <div><label class="champ" for="annees">Années d'expérience <small>(hors stages et alternance)</small></label>
+        <input id="annees" type="number" min="0" max="50" data-chemin="experience.annees" data-type="nombre"></div>
+      <div><label class="champ" for="exp-resume">Ton expérience en une phrase</label>
+        <input id="exp-resume" data-chemin="experience.resume" placeholder="Deux stages de 6 mois en contrôle de gestion"></div>
+      <div><label class="champ" for="ecart">Écart d'expérience toléré <small>(en années)</small></label>
+        <input id="ecart" type="number" min="0" max="10" data-chemin="experience.ecart_tolere_annees" data-type="nombre">
+        <p class="aide">Une offre qui demande plus que ton expérience + cet écart est écartée.</p></div>
+    </div>
+    <label class="champ">Contrats acceptés</label>
+    <div class="cases" data-chemin="contrat.accepte" data-type="cases">
+      <label><input type="checkbox" value="CDI"> CDI</label><label><input type="checkbox" value="CDD"> CDD</label>
+      <label><input type="checkbox" value="Intérim"> Intérim</label><label><input type="checkbox" value="Freelance"> Freelance</label>
+      <label><input type="checkbox" value="VIE"> VIE</label><label><input type="checkbox" value="Alternance"> Alternance</label>
+      <label><input type="checkbox" value="Stage"> Stage</label>
+    </div>
+    <div class="grille">
+      <div><label class="champ" for="prefere">Contrat préféré</label>
+        <select id="prefere" data-chemin="contrat.prefere"><option>CDI</option><option>CDD</option><option>Freelance</option><option>Alternance</option><option>Stage</option><option value="">Pas de préférence</option></select></div>
+      <div><label class="champ">Langues des candidatures</label>
+        <div class="cases" data-chemin="langues_candidature" data-type="cases">
+          <label><input type="checkbox" value="fr"> Français</label><label><input type="checkbox" value="en"> Anglais</label></div></div>
+      <div><label class="champ" for="smin">Salaire minimum <small>(€ brut par an)</small></label>
+        <input id="smin" type="number" step="1000" min="0" data-chemin="salaire.minimum_eur" data-type="nombre"></div>
+      <div><label class="champ" for="scible">Salaire visé <small>(ex : 38000-45000)</small></label>
+        <input id="scible" data-chemin="salaire.cible_eur"></div>
+    </div>
+  </section>
+
+  <section class="carte">
+    <h2>3. Où ?</h2>
+    <div class="grille">
+      <div><label class="champ" for="vrech">Ville de recherche <small>(LinkedIn, Indeed)</small></label>
+        <input id="vrech" data-chemin="localisation.ville_recherche" placeholder="Lyon, France"></div>
+      <div><label class="champ" for="pays">Pays</label><input id="pays" data-chemin="localisation.pays" placeholder="France"></div>
+    </div>
+    <label class="champ" for="zones">Villes et zones acceptées <small>(une par ligne ; vide = partout)</small></label>
+    <textarea id="zones" data-chemin="localisation.zones_acceptees" data-type="liste" placeholder="Lyon&#10;Villeurbanne&#10;Rhône"></textarea>
+    <div class="cases" style="margin-top:10px"><label><input type="checkbox" id="remote" data-chemin="localisation.teletravail_complet_france" data-type="bool"> J'accepte aussi le télétravail complet depuis la France</label></div>
+  </section>
+
+  <section class="carte">
+    <h2>4. Ce que tu refuses</h2>
+    <p class="aide">Une offre qui touche l'un de ces critères est écartée d'office, quelle que soit sa note.</p>
+    <label class="champ" for="elim">Critères éliminatoires <small>(un par ligne)</small></label>
+    <textarea id="elim" data-chemin="criteres_eliminatoires" data-type="liste" placeholder="Défense ou armement&#10;Travail de nuit"></textarea>
+    <label class="champ" for="excl">Entreprises à ne jamais proposer</label>
+    <textarea id="excl" data-chemin="entreprises_exclues" data-type="liste"></textarea>
+  </section>
+
+  <section class="carte">
+    <details id="avance">
+      <summary>5. Réglages de la recherche</summary>
+      <p class="aide">Claude ajuste lui-même ces listes après chaque analyse. Tu peux les laisser telles quelles.</p>
+      <label class="champ" for="requetes">Requêtes de recherche <small>(les plus prometteuses en premier ; utilisées 2 par 2, à tour de rôle)</small></label>
+      <textarea id="requetes" data-chemin="recherches" data-type="liste" placeholder="contrôleur de gestion junior&#10;analyste financier débutant"></textarea>
+      <div class="grille">
+        <div><label class="champ" for="positifs">Mots attendus dans le titre <small>(vide = tous les titres)</small></label>
+          <textarea id="positifs" data-chemin="mots_cles_titre.positifs" data-type="liste"></textarea></div>
+        <div><label class="champ" for="negatifs">Mots qui font écarter le titre</label>
+          <textarea id="negatifs" data-chemin="mots_cles_titre.negatifs" data-type="liste" placeholder="stage&#10;senior&#10;alternance"></textarea></div>
+      </div>
+      <label class="champ" for="cibles">Entreprises à surveiller <small>(leurs sites carrières sont lus par l'agent « entreprises »)</small></label>
+      <textarea id="cibles" data-chemin="entreprises_cibles" data-type="liste"></textarea>
+      <label class="champ" for="sites">Autres sites d'emploi à lire <small>(adresses, une par ligne)</small></label>
+      <textarea id="sites" data-chemin="sites_a_surveiller" data-type="liste" placeholder="https://www.hellowork.com"></textarea>
+      <div class="grille">
+        <div><label class="champ" for="moteur">Mise en page du CV PDF</label>
+          <select id="moteur" data-chemin="cv.moteur">
+            <option value="auto">Automatique (LaTeX s'il est installé)</option>
+            <option value="simple">Simple (rien à installer)</option>
+            <option value="latex">LaTeX (nécessite pdflatex)</option>
+          </select></div>
+        <div><label class="champ" for="couleur">Couleur d'accent du CV</label>
+          <input id="couleur" type="color" data-chemin="cv.couleur" data-type="couleur"></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="carte">
+    <h2>6. Ton CV</h2>
+    <p class="aide">C'est la seule source que Claude utilise pour rédiger : il n'invente rien qui n'y soit pas. Colle ton CV en texte,
+      même mal mis en forme : <code>/configurer</code> dans Claude Code le remet au bon format. Ajoute tout ce qui peut servir
+      (projets, cours, outils, chiffres), même ce qui ne tient pas sur une page.</p>
+    <textarea class="cv" id="cv" spellcheck="false"></textarea>
+    <p class="aide" style="margin-top:8px">Format : <code># Prénom Nom</code>, <code>**Accroche**</code>, une ligne de coordonnées,
+      puis des sections <code>## Expérience</code> avec <code>**Entreprise — Poste** · Ville · dates</code> suivi de puces
+      <code>- …</code>, et <code>- **École** — Diplôme · dates</code> pour la formation.</p>
+  </section>
+</main>
+<div class="barre"><div>
+  <span class="etat" id="etat"></span>
+  <a class="btn" href="/">Annuler</a>
+  <button class="btn primaire" id="enregistrer">Enregistrer</button>
+</div></div>
+<script>
+const D = /*__DONNEES__*/null;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const lire = (obj, chemin) => chemin.split(".").reduce((o, k) => (o && typeof o === "object" ? o[k] : undefined), obj);
+function ecrire(obj, chemin, valeur) {
+  const cles = chemin.split("."); let o = obj;
+  cles.slice(0, -1).forEach((k) => { o[k] = o[k] && typeof o[k] === "object" ? o[k] : {}; o = o[k]; });
+  o[cles[cles.length - 1]] = valeur;
+}
+
+function remplir() {
+  document.querySelectorAll("[data-chemin]").forEach((el) => {
+    const v = lire(D.prefs, el.dataset.chemin), type = el.dataset.type;
+    if (type === "liste") el.value = Array.isArray(v) ? v.join("\n") : (v || "");
+    else if (type === "cases") el.querySelectorAll("input").forEach((c) => c.checked = Array.isArray(v) && v.includes(c.value));
+    else if (type === "bool") el.checked = !!v;
+    else if (type === "couleur") el.value = "#" + String(v || "1F3A5F").replace("#", "");
+    else el.value = v ?? "";
+  });
+  if (!lire(D.prefs, "experience.niveau")) $("niveau").value = "debutant";
+  $("cv").value = D.cv || "";
+}
+
+function collecter() {
+  const prefs = {};
+  document.querySelectorAll("[data-chemin]").forEach((el) => {
+    const type = el.dataset.type; let v;
+    if (type === "liste") v = el.value.split("\n").map((x) => x.trim()).filter(Boolean);
+    else if (type === "cases") v = [...el.querySelectorAll("input:checked")].map((c) => c.value);
+    else if (type === "bool") v = el.checked;
+    else if (type === "nombre") v = el.value === "" ? null : Number(el.value);
+    else if (type === "couleur") v = el.value.replace("#", "").toUpperCase();
+    else v = el.value.trim();
+    ecrire(prefs, el.dataset.chemin, v);
+  });
+  return prefs;
+}
+
+function rendreDiag(points) {
+  $("diag").innerHTML = points.map((p) => `<li><span>${p.ok ? "✅" : p.obligatoire ? "❌" : "➖"}</span>
+    <span>${esc(p.titre)}${p.conseil ? `<small>${esc(p.conseil)}</small>` : ""}</span></li>`).join("");
+}
+
+let modifie = false;
+document.addEventListener("input", () => { modifie = true; $("etat").textContent = "Modifications non enregistrées"; });
+window.addEventListener("beforeunload", (e) => { if (modifie) { e.preventDefault(); e.returnValue = ""; } });
+
+$("enregistrer").onclick = async () => {
+  if (!$("nom").value.trim()) { $("etat").innerHTML = `<span class="erreur">Indique au moins ton prénom et ton nom.</span>`; $("nom").focus(); return; }
+  $("enregistrer").disabled = true; $("etat").textContent = "Enregistrement…";
+  try {
+    const r = await fetch("/api/profil", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prefs: collecter(), cv: $("cv").value }) });
+    const res = await r.json();
+    if (!res.ok) throw new Error(res.erreur || "Erreur");
+    modifie = false;
+    rendreDiag(res.diagnostic);
+    $("etat").innerHTML = res.configure ? `Enregistré dans preferences.yml et cv.md. <a href="/">Retour au tableau de bord →</a>`
+                                        : "Enregistré. Il reste des points à régler (voir « État de l'installation »).";
+  } catch (err) {
+    $("etat").innerHTML = `<span class="erreur">Échec : ${esc(err.message)}</span>`;
+  } finally { $("enregistrer").disabled = false; }
+};
+
+$("demo").hidden = !D.demo;
+if (D.demo) $("enregistrer").disabled = true;
+if (!D.configure) $("avance").open = false;
+rendreDiag(D.diagnostic);
+remplir();
+</script>
+</body>
+</html>

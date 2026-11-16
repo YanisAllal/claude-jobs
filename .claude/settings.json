@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./jobs:*)",
+      "Bash(./installer.sh)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Read(./**)",
+      "Edit(./candidatures/**)",
+      "Write(./candidatures/**)",
+      "Write(./data/tmp/**)",
+      "WebSearch"
+    ],
+    "deny": [
+      "Edit(./data/etat.json)",
+      "Write(./data/etat.json)"
+    ]
+  }
+}

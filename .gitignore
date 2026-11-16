@@ -1,0 +1,21 @@
+# Données personnelles : elles restent sur ton ordinateur
+/preferences.yml
+/cv.md
+/journal.md
+/suivi.csv
+/suivi.tmp
+/data/
+/candidatures/
+/pages/
+/tableau_de_bord.html
+/mes_documents/
+
+# Démo régénérée par ./jobs demo
+/.demo/
+
+# Environnement
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.claude/settings.local.json

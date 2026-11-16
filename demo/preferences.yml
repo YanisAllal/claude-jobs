@@ -1,0 +1,48 @@
+# Profil FICTIF utilisé par ./jobs demo. Ton propre profil est dans preferences.yml, à la racine du projet.
+
+profil:
+  nom: "Camille Martin"
+  email: "camille.martin@exemple.fr"
+  telephone: "06 00 00 00 00"
+  ville: "Lyon, France"
+  linkedin: ""
+  accroche: "Diplômée d'un master en contrôle de gestion, à l'aise avec Excel, Power BI et SQL"
+  points_forts: ["Modèles budgétaires sous Excel", "Tableaux de bord Power BI", "Deux stages en contrôle de gestion"]
+experience:
+  niveau: "debutant"
+  annees: 0
+  resume: "Deux stages de 6 mois en contrôle de gestion"
+  ecart_tolere_annees: 1
+postes_vises: ["Contrôleur de gestion", "Analyste financier", "Business analyst"]
+secteurs_preferes: ["Santé", "Industrie", "Agroalimentaire"]
+recherches: ["contrôleur de gestion junior", "contrôleur de gestion débutant", "analyste financier junior", "business analyst junior"]
+mots_cles_titre:
+  positifs: ["contrôleur de gestion", "contrôle de gestion", "analyste financier", "business analyst", "fp&a"]
+  negatifs: ["stage", "stagiaire", "alternance", "senior", "lead", "directeur", "responsable"]
+localisation:
+  pays: "France"
+  ville_recherche: "Lyon, France"
+  zones_acceptees: ["Lyon", "Villeurbanne", "Vénissieux", "Saint-Priest", "Rhône"]
+  teletravail_complet_france: false
+contrat:
+  accepte: ["CDI", "CDD"]
+  prefere: "CDI"
+salaire:
+  minimum_eur: 32000
+  cible_eur: "35000-40000"
+criteres_eliminatoires: ["Défense ou armement", "Expérience exigée de plus de 2 ans"]
+entreprises_exclues: []
+entreprises_cibles: []
+sites_a_surveiller: []
+langues_candidature: ["fr", "en"]
+cv:
+  moteur: "simple"
+  couleur: "1F5F4A"
+  max_pages: 1
+limites:
+  resultats_par_recherche: 15
+  recherches_max_par_session: 2
+  pause_secondes: [10, 25]
+  delai_minimum_heures: 24
+  offres_publiees_depuis_jours: 7
+  descriptions_linkedin: true

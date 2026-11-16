@@ -1,0 +1,8 @@
+#!/bin/sh
+# Lanceur : utilise l'environnement Python du projet.
+DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ ! -x "$DIR/.venv/bin/python" ]; then
+  echo "L'environnement Python n'est pas installé. Lance d'abord : ./installer.sh" >&2
+  exit 1
+fi
+exec "$DIR/.venv/bin/python" "$DIR/jobs.py" "$@"

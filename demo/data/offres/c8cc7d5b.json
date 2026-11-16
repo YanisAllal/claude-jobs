@@ -1,0 +1,12 @@
+{
+  "id": "c8cc7d5b",
+  "source": "site_entreprise",
+  "titre": "Contrôleur de gestion",
+  "entreprise": "Transports Lumière",
+  "lieu": "Saint-Priest",
+  "contrat": "CDI",
+  "teletravail": "1 jour par semaine",
+  "salaire": "38 k€",
+  "url": "https://example.com/offres/transports-lumiere-controleur",
+  "description": "Publiée le {{J-21|fr}}\nTransports Lumière (entreprise fictive), transport routier de marchandises, 900 salariés.\nMissions : reporting mensuel des agences, suivi budgétaire, calcul de la rentabilité par client.\nProfil : Bac+5 contrôle de gestion, débutant accepté, Excel avancé."
+}

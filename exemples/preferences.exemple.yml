@@ -1,0 +1,90 @@
+# Tes préférences de recherche. Ce fichier est lu par ./jobs et par Claude.
+# ./installer.sh le copie en preferences.yml (à la racine du projet). Trois façons de le remplir :
+#   - dans Claude Code, tape /configurer : Claude te pose les questions et lit ton CV ;
+#   - dans le navigateur : ./jobs serveur, puis « Mon profil » ;
+#   - à la main, en suivant les commentaires ci-dessous.
+# preferences.yml n'est pas suivi par git : tes informations restent sur ton ordinateur.
+
+profil:
+  nom: "Prénom Nom"               # écrit en haut du CV et des lettres
+  email: ""
+  telephone: ""
+  ville: "Paris, France"          # la partie avant la virgule est écrite devant la date des lettres
+  linkedin: ""                    # facultatif, ajouté aux coordonnées des lettres
+  accroche: ""                    # une ligne sous le nom, sur le CV
+  points_forts: []                # ce que Claude peut mettre en avant
+  # adresse: ""                   # facultatif : ajoutée en haut des lettres si elle est remplie
+
+experience:
+  niveau: "debutant"              # debutant | junior | confirme | senior
+  annees: 0                       # années d'expérience hors stages et alternance
+  resume: ""                      # ex : « Deux stages de 6 mois en contrôle de gestion »
+  ecart_tolere_annees: 1          # une offre qui exige plus que annees + cet écart est écartée
+
+# Intitulés que tu vises (servent à l'analyse et à la rédaction)
+postes_vises: []
+
+# Secteurs ou thèmes qui te plaisent : bonus dans la note des offres
+secteurs_preferes: []
+
+# Requêtes envoyées aux sites d'emploi, les plus prometteuses en premier.
+# ./jobs chercher en prend 2 par lancement, à tour de rôle. Claude les ajuste après chaque analyse.
+recherches: []
+
+# Filtre sur le titre des offres (mot entier, sans tenir compte des accents ni des majuscules)
+mots_cles_titre:
+  positifs: []                    # au moins un de ces mots dans le titre ; liste vide = tous les titres passent
+  negatifs:                       # un seul de ces mots suffit à écarter l'offre
+    - "stage"
+    - "stagiaire"
+    - "intern"
+    - "internship"
+    - "alternance"
+    - "alternant"
+    - "apprenti"
+    - "senior"
+    - "lead"
+    - "directeur"
+    - "head"
+
+localisation:
+  pays: "France"
+  ville_recherche: "Paris, France"   # lieu donné à LinkedIn et Indeed
+  zones_acceptees: []                # villes, départements ou régions acceptés ; liste vide = partout
+  teletravail_complet_france: false  # accepter aussi le télétravail complet depuis la France
+
+contrat:
+  accepte: ["CDI", "CDD"]           # CDI, CDD, Intérim, Freelance, VIE, Alternance, Stage
+  prefere: "CDI"
+
+salaire:
+  minimum_eur: null                 # brut annuel ; null = pas de minimum
+  cible_eur: ""                     # ex : "38000-45000"
+
+# Rédhibitoire : l'offre est écartée d'office (Claude lit la description pour les repérer)
+criteres_eliminatoires: []
+
+# Employeurs à ne jamais proposer (mot entier dans le nom de l'entreprise)
+entreprises_exclues: []
+
+# Entreprises dont l'agent « entreprises » lit directement les offres (sites carrières, Lever, Ashby, Greenhouse…)
+entreprises_cibles: []
+
+# Autres sites d'emploi que les agents lisent à chaque recherche complète (adresses)
+sites_a_surveiller: []
+
+langues_candidature: ["fr"]          # ajoute "en" pour les offres rédigées en anglais
+
+cv:
+  moteur: "auto"                     # auto (LaTeX s'il est installé) | simple (rien à installer) | latex
+  couleur: "1F3A5F"                  # couleur d'accent (hexadécimal) ; "000000" pour du noir
+  max_pages: 1
+
+# Garde-fous pour ./jobs chercher (LinkedIn, Indeed) : peu de recherches, espacées, pour ne pas être bloqué.
+limites:
+  resultats_par_recherche: 15       # offres demandées par requête et par site
+  recherches_max_par_session: 2     # requêtes prises dans « recherches » à chaque lancement
+  pause_secondes: [10, 25]          # pause aléatoire entre deux requêtes
+  delai_minimum_heures: 24          # un même site n'est pas réinterrogé avant ce délai
+  offres_publiees_depuis_jours: 7
+  descriptions_linkedin: true       # récupère le texte complet des offres LinkedIn (plus lent)

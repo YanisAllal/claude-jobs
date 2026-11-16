@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offre</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e4e4df;
+    --accent: #2f5bea; --good: #1f8a4c; --mid: #b7791f; --bad: #c0392b; --chip: #efefea; --warn-bg: #fff4d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151514; --surface: #1e1e1c; --text: #ececea; --muted: #9a9a94; --line: #2f2f2c;
+            --accent: #7b9bff; --good: #4cc483; --mid: #e0a84a; --bad: #ef6b5c; --chip: #2a2a27; --warn-bg: #3a3020; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px 16px 80px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  button { font: inherit; cursor: pointer; }
+  .nav { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+  .nav .fleches a { margin-left: 12px; }
+  .muted { color: var(--muted); }
+  .bandeau { background: var(--chip); border-radius: 10px; padding: 10px 14px; margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+  .bandeau code { background: var(--surface); padding: 1px 6px; border-radius: 4px; color: var(--text); }
+
+  .entete { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin-top: 14px;
+            display: grid; grid-template-columns: 1fr auto; gap: 16px; }
+  .entete h1 { font-size: 21px; margin: 0 0 2px; line-height: 1.25; }
+  .entreprise { font-size: 15px; color: var(--muted); }
+  .faits { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { display: inline-block; background: var(--chip); border-radius: 999px; padding: 2px 10px; font-size: 12px; white-space: nowrap; }
+  .chip.urgent { background: color-mix(in srgb, var(--bad) 20%, transparent); color: var(--bad); font-weight: 600; }
+  .chip.bientot { background: color-mix(in srgb, var(--mid) 22%, transparent); }
+  .chip.manque { background: var(--warn-bg); }
+  .score { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; line-height: 1; }
+  .score small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 4px; }
+  .s-hi { color: var(--good); } .s-mid { color: var(--mid); } .s-lo { color: var(--bad); }
+  .postuler { margin-top: 14px; border: 1px solid color-mix(in srgb, var(--good) 45%, var(--line)); border-radius: 12px;
+              background: color-mix(in srgb, var(--good) 8%, var(--surface)); padding: 12px 14px; }
+  .postuler.sans-lien { border-color: color-mix(in srgb, var(--mid) 50%, var(--line)); background: color-mix(in srgb, var(--mid) 9%, var(--surface)); }
+  .postuler h2 { font-size: 14px; margin: 0 0 6px; }
+  .postuler p { margin: 0 0 10px; font-size: 13px; }
+  .postuler .boutons { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn.vert { background: var(--good); border-color: var(--good); color: #fff; font-weight: 600; font-size: 14px; padding: 9px 16px; }
+  .resume { margin-top: 10px; color: var(--muted); font-size: 13px; }
+  .actions-haut { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .btn { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 8px; padding: 7px 12px;
+         font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); text-decoration: none; }
+  .btn.primaire { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .btn.petit { padding: 3px 9px; font-size: 12px; }
+  .btn:disabled { opacity: .5; cursor: default; }
+
+  .grille { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; margin-top: 16px; align-items: start; }
+  @media (max-width: 860px) { .grille { grid-template-columns: 1fr; } .entete { grid-template-columns: 1fr; } .score { text-align: left; } }
+  .carte { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .carte + .carte { margin-top: 16px; }
+  .carte h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; }
+
+  .onglets { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin: -4px -6px 14px; padding: 0 6px; }
+  .onglets button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 10px; color: var(--muted); }
+  .onglets button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+  .onglets .compte { font-size: 11px; margin-left: 4px; }
+  .outils { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+
+  .md h1 { font-size: 19px; margin: 4px 0 6px; }
+  .md h2 { font-size: 16px; margin: 18px 0 6px; }
+  .md h3 { font-size: 14px; margin: 14px 0 4px; }
+  .md h4 { font-size: 13px; margin: 12px 0 4px; }
+  .md p { margin: 6px 0; }
+  .md ul, .md ol { margin: 6px 0; padding-left: 22px; }
+  .md li { margin: 3px 0; }
+  .md code { background: var(--chip); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  .md table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 13px; }
+  .md th, .md td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  .md th { background: var(--chip); }
+  .md hr { border: 0; border-top: 1px solid var(--line); margin: 12px 0; }
+  .md mark, mark.manque { background: var(--warn-bg); color: inherit; padding: 0 3px; border-radius: 3px; font-weight: 600; }
+  .md ul.taches { list-style: none; padding-left: 0; }
+  .md li.tache label { display: flex; gap: 10px; align-items: flex-start; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+  .md li.tache label:hover { background: var(--chip); }
+  .md li.tache input { margin-top: 3px; width: 17px; height: 17px; flex: none; accent-color: var(--good); }
+  .md li.tache.fait span { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+
+  .progres { height: 8px; background: var(--chip); border-radius: 999px; overflow: hidden; margin: 4px 0 12px; }
+  .progres div { height: 100%; background: var(--good); transition: width .25s; }
+  .fin { background: color-mix(in srgb, var(--good) 14%, transparent); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px;
+         display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .section { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+  .section-tete { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .section-tete h4 { margin: 0; font-size: 14px; }
+  .compteur { font-size: 11px; color: var(--muted); }
+  .compteur.trop { color: var(--bad); font-weight: 600; }
+  .desc { white-space: pre-wrap; font-size: 13.5px; }
+  .vide { color: var(--muted); padding: 24px 4px; }
+
+  label.champ { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+  select, input, textarea { width: 100%; background: var(--surface); color: var(--text); border: 1px solid var(--line);
+                            border-radius: 8px; padding: 7px 9px; font: inherit; font-size: 13px; }
+  textarea { min-height: 56px; resize: vertical; }
+  textarea.editeur-lettre { min-height: 460px; font-family: "Times New Roman", Times, serif; font-size: 15px; line-height: 1.5; padding: 12px 14px; }
+  .aide-lettre { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .rapides { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .rapides .btn { justify-content: center; }
+  .historique { list-style: none; padding: 0; margin: 0; font-size: 12.5px; }
+  .historique li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .historique li:last-child { border-bottom: 0; }
+  .historique b { color: var(--muted); font-weight: 600; margin-right: 4px; }
+  .fichiers a { display: block; font-size: 13px; padding: 2px 0; }
+  .raccourcis { font-size: 11.5px; color: var(--muted); margin-top: 14px; }
+  kbd { background: var(--chip); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; font-size: 11px; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg);
+           padding: 8px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 9; }
+  .toast.vu { opacity: 1; }
+
+  .btn.claude { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); color: var(--accent); font-weight: 600; }
+  .tache { margin-top: 12px; border-radius: 10px; padding: 10px 12px; font-size: 13px; border: 1px solid var(--line); background: var(--chip); }
+  .tache.en_cours { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .tache.termine { border-color: color-mix(in srgb, var(--good) 45%, var(--line)); background: color-mix(in srgb, var(--good) 9%, var(--surface)); }
+  .tache.erreur { border-color: color-mix(in srgb, var(--bad) 45%, var(--line)); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
+  .tache-tete { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tache pre { white-space: pre-wrap; font: 12.5px/1.45 ui-monospace, Menlo, monospace; margin: 8px 0 0; max-height: 260px; overflow: auto; }
+  .rond { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--accent); border-right-color: transparent;
+          border-radius: 50%; animation: tourne .8s linear infinite; vertical-align: -1px; margin-right: 6px; }
+  @keyframes tourne { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .rond { animation: none; } }
+  dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--text);
+           padding: 20px; width: min(620px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
+  dialog::backdrop { background: rgb(0 0 0 / .35); }
+  dialog h2 { font-size: 16px; margin: 0 0 4px; }
+  dialog .q { font-size: 12.5px; margin: 14px 0 4px; }
+  dialog .q mark { background: var(--warn-bg); color: inherit; padding: 0 3px; border-radius: 3px; }
+  dialog .q .ou { color: var(--muted); font-size: 11.5px; }
+  dialog .boutons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="nav">
+    <a href="../tableau_de_bord.html" id="retour">← Toutes les offres</a>
+    <span class="fleches"><a id="prec" hidden>← Précédente</a><a id="suiv" hidden>Suivante →</a></span>
+  </div>
+  <div class="bandeau" id="bandeau" hidden>Version en lecture seule : pour cocher la checklist ou changer le statut, ouvre
+    <a id="lien-serveur">la version modifiable</a> (si elle ne s'ouvre pas, lance d'abord <code>./jobs serveur</code> dans le dossier du projet).</div>
+
+  <section class="entete">
+    <div>
+      <h1 id="titre"></h1>
+      <div class="entreprise" id="entreprise"></div>
+      <div class="faits" id="faits"></div>
+      <div class="resume" id="resume"></div>
+      <div class="postuler" id="postuler"></div>
+      <div class="actions-haut" id="actions-haut"></div>
+      <div class="tache" id="tache" hidden></div>
+    </div>
+    <div class="score" id="score"></div>
+  </section>
+
+  <div class="grille">
+    <section class="carte">
+      <div class="onglets" id="onglets" role="tablist"></div>
+      <div id="contenu"></div>
+    </section>
+
+    <aside>
+      <section class="carte">
+        <h3>Suivi</h3>
+        <div id="statut-actuel"></div>
+        <div class="rapides" id="rapides" style="margin-top:10px"></div>
+        <label class="champ" for="f-statut">Statut</label>
+        <select id="f-statut"></select>
+        <label class="champ" for="f-note">Note (ajoutée à l'historique)</label>
+        <textarea id="f-note" placeholder="ex : envoyé via le site de l'entreprise, entretien RH avec…"></textarea>
+        <label class="champ" for="f-action">Prochaine action</label>
+        <input id="f-action" placeholder="ex : Entretien technique le 14/11">
+        <button class="btn primaire" id="f-ok" style="margin-top:10px;width:100%;justify-content:center">Enregistrer</button>
+      </section>
+      <section class="carte">
+        <h3>Historique</h3>
+        <ul class="historique" id="historique"></ul>
+      </section>
+      <section class="carte" id="carte-fichiers">
+        <h3>Fichiers du dossier</h3>
+        <div class="fichiers" id="fichiers"></div>
+      </section>
+      <div class="raccourcis"><kbd>←</kbd> <kbd>→</kbd> offre précédente / suivante · <kbd>1</kbd>–<kbd>6</kbd> onglets · <kbd>Échap</kbd> retour</div>
+    </aside>
+  </div>
+</main>
+<dialog id="dlg-claude">
+  <form method="dialog" id="form-claude">
+    <h2 id="dlg-claude-titre"></h2>
+    <div class="muted" id="dlg-claude-sous" style="font-size:12.5px"></div>
+    <div id="dlg-claude-champs"></div>
+    <label class="champ" for="dlg-claude-consignes">Autres consignes pour Claude (facultatif)</label>
+    <textarea id="dlg-claude-consignes" placeholder="ex : raccourcis la lettre, mets plus en avant mon dernier stage, ajoute mon projet de fin d'études…"></textarea>
+    <div class="boutons">
+      <button class="btn" value="annuler" formnovalidate>Annuler</button>
+      <button class="btn primaire" value="ok" id="dlg-claude-ok">Lancer Claude</button>
+    </div>
+  </form>
+</dialog>
+<div class="toast" id="toast"></div>
+<script>
+const D = /*__DONNEES__*/null;
+const O = D.offre;
+const SERVI = location.protocol.startsWith("http");
+const URL_SERVEUR = `http://127.0.0.1:${(D.config && D.config.port) || 8765}/`;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fichierUrl = (f) => "../" + O.dossier + encodeURIComponent(f);
+const AUJ = new Date(); AUJ.setHours(0, 0, 0, 0);
+const joursAvant = (iso) => Math.round((new Date(iso + "T00:00:00") - AUJ) / 864e5);
+const dateFr = (iso) => iso ? iso.split("-").reverse().join("/") : "";
+
+document.title = `${O.entreprise} · ${O.titre}`;
+
+// ---------------------------------------------------------------- mini-rendu Markdown
+function inline(s) {
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  s = s.replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\*)/g, "$1<i>$2</i>");
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) =>
+    /^https?:/.test(u) ? `<a href="${u}" target="_blank" rel="noopener">${t}</a>` : `<a href="${fichierUrl(u.split("/").pop())}">${t}</a>`);
+  s = s.replace(/(^|[\s(;])(https?:\/\/[^\s<)]+[^\s<).,;:])/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+  s = s.replace(/\[À COMPLÉTER[^\]]*\]/g, (m) => `<mark>${m}</mark>`);
+  return s;
+}
+
+// les .md sont coupés vers 120 caractères : on recolle une ligne longue à la suivante (les lignes courtes, comme
+// « Merci, » ou une signature, gardent leur retour à la ligne)
+const LONGUE = 70;
+function recoller(lignes) {
+  const out = [];
+  for (const l of lignes) {
+    const prec = out[out.length - 1];
+    if (prec !== undefined && prec.length >= LONGUE && l.trim() && !/^\s*([-*]|\d+\.|#|\|)\s/.test(l)) out[out.length - 1] = prec + " " + l.trim();
+    else out.push(l);
+  }
+  return out;
+}
+
+function md(texte) {
+  const L = (texte || "").split("\n");
+  let h = "", para = [], liste = null, items = [];
+  const finPara = () => { if (para.length) { h += `<p>${recoller(para).map(inline).join("<br>")}</p>`; para = []; } };
+  const finListe = () => {
+    if (!liste) return;
+    const tag = liste === "ol" ? "ol" : "ul";
+    h += `<${tag}${liste === "taches" ? ' class="taches"' : ""}>` + items.map((it) => it.deb + inline(it.txt.join(" ")) + it.fin).join("") + `</${tag}>`;
+    liste = null; items = [];
+  };
+  for (let i = 0; i < L.length; i++) {
+    const l = L[i]; let m;
+    if (!l.trim()) { finPara(); finListe(); continue; }
+    if ((m = l.match(/^(#{1,4})\s+(.*)/))) { finPara(); finListe(); const n = m[1].length; h += `<h${n}>${inline(m[2])}</h${n}>`; continue; }
+    if (/^\s*---+\s*$/.test(l)) { finPara(); finListe(); h += "<hr>"; continue; }
+    if (/^\s*\|/.test(l)) {
+      finPara(); finListe();
+      const rangs = [];
+      while (i < L.length && /^\s*\|/.test(L[i])) { rangs.push(L[i]); i++; }
+      i--;
+      const cellules = (r) => r.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      const corps = rangs.filter((r) => !/^\s*\|[\s:|-]+\|\s*$/.test(r));
+      h += "<table>" + corps.map((r, k) => "<tr>" + cellules(r).map((c) => k ? `<td>${inline(c)}</td>` : `<th>${inline(c)}</th>`).join("") + "</tr>").join("") + "</table>";
+      continue;
+    }
+    if ((m = l.match(/^\s*[-*] \[([ xX])\]\s*(.*)/))) {
+      finPara(); if (liste !== "taches") { finListe(); liste = "taches"; }
+      const fait = m[1] !== " ";
+      items.push({ deb: `<li class="tache${fait ? " fait" : ""}"><label><input type="checkbox" data-ligne="${i}"${fait ? " checked" : ""}><span>`,
+                   txt: [m[2]], fin: "</span></label></li>" });
+      continue;
+    }
+    if ((m = l.match(/^\s*[-*]\s+(.*)/))) {
+      finPara(); if (liste !== "ul") { finListe(); liste = "ul"; }
+      items.push({ deb: "<li>", txt: [m[1]], fin: "</li>" }); continue;
+    }
+    if ((m = l.match(/^\s*\d+\.\s+(.*)/))) {
+      finPara(); if (liste !== "ol") { finListe(); liste = "ol"; }
+      items.push({ deb: "<li>", txt: [m[1]], fin: "</li>" }); continue;
+    }
+    if (liste && /^\s+\S/.test(l)) { items[items.length - 1].txt.push(l.trim()); continue; }  // suite d'un élément de liste
+    finListe(); para.push(l);
+  }
+  finPara(); finListe();
+  return h;
+}
+
+// texte à coller dans un formulaire : sans Markdown ni notes perso « *(…)* »
+function texteBrut(t) {
+  return recoller(t.split("\n").filter((l) => !/^\s*\*\(.*\)\*\s*$/.test(l)))
+    .map((l) => l.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\*)/g, "$1$2")
+                 .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1 ($2)"))
+    .join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+// ---------------------------------------------------------------- petits outils
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("vu"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("vu"), 2000); }
+async function copier(texte) {
+  try { await navigator.clipboard.writeText(texte); }
+  catch { const t = document.createElement("textarea"); t.value = texte; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); }
+  toast(texte.includes("[À COMPLÉTER") ? "Copié, mais il reste un [À COMPLÉTER] à remplir" : `Copié (${texte.length} caractères)`);
+}
+async function api(route, corps) {
+  if (!SERVI) { location.href = URL_SERVEUR + "pages/" + O.id + ".html" + location.hash; throw new Error("redirection"); }
+  const r = await fetch(route, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) });
+  const res = await r.json();
+  if (!res.ok) throw new Error(res.erreur || "Erreur");
+  return res;
+}
+
+// ---------------------------------------------------------------- en-tête
+function rendreEntete() {
+  $("titre").textContent = O.titre;
+  $("entreprise").textContent = [O.entreprise, O.lieu].filter(Boolean).join(" · ");
+  const f = [];
+  f.push(`<span class="chip">${esc((O.statut || "").replace("_", " "))}</span>`);
+  if (O.contrat) f.push(`<span class="chip">${esc(O.contrat)}</span>`);
+  if (O.salaire) f.push(`<span class="chip">${esc(O.salaire)}</span>`);
+  if (O.teletravail) f.push(`<span class="chip">télétravail : ${esc(O.teletravail)}</span>`);
+  if (O.date_limite) {
+    const j = joursAvant(O.date_limite);
+    const cls = j < 0 ? "" : j <= 3 ? "urgent" : j <= 10 ? "bientot" : "";
+    f.push(`<span class="chip ${cls}">${j < 0 ? "date limite passée" : "limite le " + dateFr(O.date_limite) + (j === 0 ? " (aujourd'hui !)" : ` (J-${j})`)}</span>`);
+  }
+  if (O.relance && ["postulee", "relancee"].includes(O.statut)) {
+    const j = joursAvant(O.relance);
+    f.push(`<span class="chip ${j <= 0 ? "urgent" : ""}">${j <= 0 ? "à relancer maintenant" : "relance le " + dateFr(O.relance)}</span>`);
+  }
+  if (O.date_candidature) f.push(`<span class="chip">envoyée le ${dateFr(O.date_candidature)}</span>`);
+  if (O.a_completer) f.push(`<span class="chip manque">${O.a_completer} [À COMPLÉTER] dans le dossier</span>`);
+  f.push(`<span class="chip">${esc(O.source)} · ajoutée le ${dateFr(O.date_ajout)}</span>`);
+  $("faits").innerHTML = f.join("");
+  $("resume").innerHTML = (O.resume ? esc(O.resume) : "") + (O.prochaine_action ? `<br><b>→ ${esc(O.prochaine_action)}</b>` : "");
+  const s = O.score === "" ? null : +O.score;
+  $("score").innerHTML = s === null ? `–<small>pas encore notée</small>` : `<span class="${s >= 70 ? "s-hi" : s >= 50 ? "s-mid" : "s-lo"}">${s}</span><small>sur 100</small>`;
+
+  rendrePostuler();
+  const a = [];
+  if (O.url && O.url !== O.lien_postuler) a.push(`<a class="btn" href="${esc(O.url)}" target="_blank" rel="noopener">Page de l'offre ↗</a>`);
+  if (O.fichiers.includes("cv.pdf")) a.push(`<a class="btn" href="${fichierUrl("cv.pdf")}" target="_blank">CV PDF ↗</a>`);
+  else if (O.fichiers.includes("cv.md")) a.push(`<button class="btn" data-act="cv-pdf">Imprimer le CV en PDF</button>`);
+  if (O.fichiers.includes("lettre.pdf")) a.push(`<a class="btn" href="${fichierUrl("lettre.pdf")}" target="_blank">Lettre PDF ↗</a>`);
+  if (O.dossier) a.push(`<button class="btn" data-act="finder">Ouvrir le dossier</button>`);
+  if (O.dossier) a.push(`<button class="btn claude" data-act="claude" title="Claude Code complète le dossier en arrière-plan">✦ Compléter le dossier${aCompleter().length ? ` (${aCompleter().length})` : ""}</button>`);
+  else if (O.statut !== "ecartee") a.push(`<button class="btn claude" data-act="claude" title="Claude Code prépare le dossier en arrière-plan">✦ Préparer le dossier</button>`);
+  a.push(`<button class="btn" data-act="id" title="Pour en parler à Claude">id ${esc(O.id)}</button>`);
+  $("actions-haut").innerHTML = a.join("");
+}
+
+// ---------------------------------------------------------------- encadré « Comment postuler »
+function sectionReponses(motif) {
+  const s = (D.textes["reponses.md"] || "").split(/^## /m).slice(1).find((x) => motif.test(x.split("\n")[0]));
+  return s ? texteBrut(s.split("\n").slice(1).join("\n")) : "";
+}
+function rendrePostuler() {
+  const lien = O.lien_postuler || (O.source !== "candidature_spontanee" ? O.url : "");
+  const linkedin = /linkedin/i.test(O.canal || "") || O.source === "candidature_spontanee";
+  const b = [];
+  if (lien) b.push(`<a class="btn vert" href="${esc(lien)}" target="_blank" rel="noopener">Postuler ici ↗</a>`);
+  if (linkedin) {
+    const q = encodeURIComponent(`${O.entreprise} recrutement OR talent OR RH`);
+    b.push(`<a class="btn ${lien ? "" : "vert"}" href="https://www.linkedin.com/search/results/people/?keywords=${q}" target="_blank" rel="noopener">Trouver un contact sur LinkedIn ↗</a>`);
+    if (sectionReponses(/linkedin/i)) b.push(`<button class="btn" data-act="copier-linkedin">Copier le message LinkedIn</button>`);
+  }
+  if (sectionReponses(/^e-mail/i)) b.push(`<button class="btn" data-act="copier-email">Copier l'e-mail</button>`);
+  const titre = lien ? "Où postuler" : "Pas de formulaire de candidature";
+  const texte = O.canal ? inline(O.canal) : lien ? "Lien direct vers la candidature." : "Aucun lien direct connu : passe par un contact (LinkedIn ou e-mail).";
+  $("postuler").className = "postuler" + (lien ? "" : " sans-lien");
+  $("postuler").innerHTML = `<h2>${titre}</h2><p>${texte}</p><div class="boutons">${b.join("")}</div>`;
+}
+
+// ---------------------------------------------------------------- onglets
+const ONGLETS = [
+  ["checklist", "Checklist", "checklist.md"],
+  ["reponses", "Réponses à copier", "reponses.md"],
+  ["lettre", "Lettre", "lettre.md"],
+  ["mail", "Mail", "mail.md"],
+  ["cv", "CV", "cv.md"],
+  ["fiche", "Fiche", "fiche.md"],
+  ["offre", "Offre", null],
+];
+const dispo = () => ONGLETS.filter(([, , f]) => !f || D.textes[f] !== undefined);
+let onglet = null;
+let editionLettre = false, brouillonLettre = null, versionPdf = Date.now();
+window.addEventListener("beforeunload", (e) => {
+  if (editionLettre && brouillonLettre !== null && brouillonLettre !== D.textes["lettre.md"]) { e.preventDefault(); e.returnValue = ""; }
+});
+
+function rendreOnglets() {
+  const liste = dispo();
+  if (!liste.find((o) => o[0] === onglet)) onglet = liste[0][0];
+  $("onglets").innerHTML = liste.map(([cle, nom]) => {
+    let compte = "";
+    if (cle === "checklist" && O.checklist) compte = `<span class="compte">${O.checklist[0]}/${O.checklist[1]}</span>`;
+    return `<button role="tab" data-onglet="${cle}" aria-selected="${cle === onglet}">${nom}${compte}</button>`;
+  }).join("");
+}
+
+function outils(boutons) { return `<div class="outils">${boutons.join("")}</div>`; }
+
+function rendreContenu() {
+  rendreOnglets();
+  const c = $("contenu");
+  const t = (f) => D.textes[f] || "";
+  if (onglet === "checklist") {
+    const [faits, total] = O.checklist || [0, 0];
+    let h = total ? `<div class="muted" style="font-size:12px">${faits} sur ${total} étapes faites</div><div class="progres"><div style="width:${100 * faits / total}%"></div></div>` : "";
+    if (total && faits === total && !["postulee", "relancee", "entretien", "test", "offre", "acceptee"].includes(O.statut))
+      h += `<div class="fin"><span>Tout est coché. La candidature est partie ?</span><button class="btn primaire petit" data-rapide="postulee">Oui, marquer comme postulée</button></div>`;
+    c.innerHTML = h + `<div class="md">${md(t("checklist.md"))}</div>`;
+  } else if (onglet === "reponses") {
+    const sections = t("reponses.md").split(/^## /m);
+    const intro = sections.shift();
+    c.innerHTML = `<div class="md">${md(intro.replace(/^# .*\n?/, ""))}</div>` + sections.map((s, k) => {
+      const [tete, ...reste] = s.split("\n");
+      const corps = reste.join("\n").trim();
+      const brut = texteBrut(corps);
+      const limite = /linkedin/i.test(tete) ? 300 : 0;
+      const compteur = `<span class="compteur${limite && brut.length > limite ? " trop" : ""}">${brut.length}${limite ? " / " + limite : ""} car.</span>`;
+      return `<div class="section"><div class="section-tete"><h4>${inline(tete)}</h4><span>${compteur}
+        <button class="btn petit" data-copier="${k}">Copier</button></span></div><div class="md">${md(corps)}</div></div>`;
+    }).join("");
+    c.dataset.sections = JSON.stringify(sections.map((s) => texteBrut(s.split("\n").slice(1).join("\n"))));
+  } else if (onglet === "lettre" && editionLettre) {
+    c.innerHTML = outils([`<button class="btn petit primaire" data-act="exporter-lettre">Enregistrer et exporter en PDF</button>`,
+                          `<button class="btn petit" data-act="annuler-lettre">Annuler</button>`,
+                          `<span class="compteur" id="mots-lettre" style="align-self:center"></span>`])
+      + `<p class="aide-lettre">1re ligne « Objet : … » (ou « Subject: … » en anglais), puis des paragraphes séparés par une ligne vide :
+         formule d'appel, corps, formule finale. Pas de signature : la mise en page l'ajoute à droite, avec tes coordonnées et la date.</p>`
+      + `<textarea id="editeur-lettre" class="editeur-lettre" spellcheck="true" lang="fr"></textarea>`;
+    const ed = $("editeur-lettre");
+    ed.value = brouillonLettre ?? t("lettre.md");
+    const compter = () => { brouillonLettre = ed.value; $("mots-lettre").textContent = texteBrut(ed.value).split(/\s+/).filter(Boolean).length + " mots"; };
+    ed.addEventListener("input", compter); compter(); ed.focus();
+  } else if (onglet === "lettre") {
+    const b = [`<button class="btn petit primaire" data-act="modifier-lettre">Modifier</button>`,
+               `<button class="btn petit" data-act="copier-lettre">Copier le texte</button>`];
+    if (O.fichiers.includes("lettre.pdf")) b.splice(1, 0, `<a class="btn petit" href="${fichierUrl("lettre.pdf")}?v=${versionPdf}" target="_blank">Ouvrir lettre.pdf ↗</a>`);
+    const mots = texteBrut(t("lettre.md")).split(/\s+/).filter(Boolean).length;
+    b.push(`<span class="compteur" style="align-self:center">${mots} mots</span>`);
+    c.innerHTML = outils(b) + `<div class="md">${md(t("lettre.md"))}</div>`;
+  } else if (onglet === "mail") {
+    c.innerHTML = outils([`<button class="btn petit" data-act="copier-mail">Copier le texte</button>`]) + `<div class="md">${md(t("mail.md"))}</div>`;
+  } else if (onglet === "cv") {
+    c.innerHTML = outils([...(O.fichiers.includes("cv.pdf") ? [`<a class="btn petit" href="${fichierUrl("cv.pdf")}" target="_blank">Ouvrir cv.pdf ↗</a>`] : []),
+                          `<button class="btn petit" data-act="cv-pdf">Imprimer en PDF (1 page)</button>`,
+                          `<button class="btn petit" data-act="copier-cv">Copier le texte</button>`]) + `<div class="md">${md(t("cv.md"))}</div>`;
+  } else if (onglet === "fiche") {
+    c.innerHTML = `<div class="md">${md(t("fiche.md"))}</div>`;
+  } else {
+    const b = [];
+    if (O.url) b.push(`<a class="btn petit" href="${esc(O.url)}" target="_blank" rel="noopener">Page d'origine ↗</a>`);
+    if (D.description) b.push(`<button class="btn petit" data-act="copier-desc">Copier la description</button>`);
+    c.innerHTML = outils(b) + (D.description ? `<div class="desc">${inline(D.description).replace(/<br>/g, "\n")}</div>`
+      : `<div class="vide">Pas de description enregistrée pour cette offre.</div>`);
+    if (!O.dossier) c.innerHTML += `<div class="bandeau">Pas encore de dossier : bouton « ✦ Préparer le dossier » en haut, ou tape <code>/dossier ${esc(O.id)}</code> dans Claude Code.</div>`;
+  }
+}
+
+// ---------------------------------------------------------------- colonne de droite
+const RAPIDES = [
+  ["postulee", "J'ai postulé"], ["relancee", "J'ai relancé"],
+  ["entretien", "Entretien"], ["refusee", "Refus reçu"],
+  ["sans_reponse", "Sans réponse"], ["ecartee", "Écarter"],
+];
+function rendreSuivi() {
+  $("statut-actuel").innerHTML = `<span class="chip">${esc(O.statut.replace("_", " "))}</span> <span class="muted" style="font-size:12px">${esc(D.statuts[O.statut] || "")}</span>`;
+  $("rapides").innerHTML = RAPIDES.filter(([s]) => s !== O.statut).map(([s, n]) => `<button class="btn petit" data-rapide="${s}">${n}</button>`).join("");
+  $("f-statut").value = O.statut;
+  $("f-action").value = O.prochaine_action || "";
+  const notes = (O.notes || "").split(" | ").filter(Boolean).reverse();
+  $("historique").innerHTML = notes.length ? notes.map((n) => {
+    const m = n.match(/^(\d{4}-\d{2}-\d{2}) : (.*)$/);
+    return m ? `<li><b>${dateFr(m[1])}</b>${inline(m[2])}</li>` : `<li>${inline(n)}</li>`;
+  }).join("") : `<li class="muted">Rien pour l'instant.</li>`;
+  $("carte-fichiers").hidden = !O.fichiers.length;
+  $("fichiers").innerHTML = O.fichiers.map((f) => `<a href="${fichierUrl(f)}" target="_blank">${esc(f)}</a>`).join("");
+}
+
+async function changerStatut(statut, note, action) {
+  try {
+    const res = await api("/api/statut", { id: O.id, statut, note, action });
+    Object.assign(O, res.offre);
+    $("f-note").value = "";
+    rendreEntete(); rendreSuivi(); rendreContenu();
+    toast(statut === "postulee" && O.prochaine_action ? "Enregistré · " + O.prochaine_action : "Enregistré dans suivi.csv");
+  } catch (e) { if (e.message !== "redirection") toast("Échec : " + e.message + " (./jobs serveur tourne-t-il ?)"); }
+}
+
+// ---------------------------------------------------------------- CV imprimable
+function imprimerCV() {
+  const w = window.open("", "_blank");
+  if (!w) { toast("Autorise les fenêtres pop-up pour imprimer"); return; }
+  const nom = `CV_${(D.config && D.config.nom) || "CV"}_${O.entreprise}`.replace(/[^\w-]+/g, "_");
+  w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(nom)}</title><style>
+    @page { size: A4; margin: 12mm 14mm; }
+    body { font: 10.3pt/1.35 "Helvetica Neue", Arial, sans-serif; color: #111; margin: 0; max-width: 182mm; }
+    h1 { font-size: 19pt; margin: 0 0 2px; } h2 { font-size: 10.5pt; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 1px solid #888; margin: 9px 0 4px; padding-bottom: 2px; } h3 { font-size: 10.5pt; margin: 6px 0 2px; }
+    p { margin: 2px 0; } ul { margin: 2px 0 4px; padding-left: 15px; } li { margin: 1px 0; }
+    a { color: inherit; text-decoration: none; } mark { background: #ffe58a; }
+    @media screen { body { margin: 20px auto; } .aide { font: 13px sans-serif; background: #eef; padding: 8px 12px; border-radius: 6px; margin-bottom: 14px; } }
+    @media print { .aide { display: none; } }
+  </style></head><body><div class="aide">Dans la fenêtre d'impression : « Enregistrer au format PDF ». Si le CV dépasse 1 page, réduis l'échelle (90 %).</div>${md(D.textes["cv.md"])}</body></html>`);
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 350);
+}
+
+// ---------------------------------------------------------------- Claude Code (préparer / compléter le dossier)
+function aCompleter() {
+  const vus = new Map();
+  for (const [f, txt] of Object.entries(D.textes || {})) {
+    for (const m of (txt || "").matchAll(/(?<!`)\[À COMPLÉTER\s*:?\s*([^\]]*)\](?!`)/g)) {
+      const q = m[1].trim() || "(sans précision)";
+      if (!vus.has(q)) vus.set(q, new Set());
+      vus.get(q).add(f);
+    }
+  }
+  return [...vus].map(([question, fichiers]) => ({ question, fichiers: [...fichiers] }));
+}
+
+function ouvrirClaude() {
+  if (!SERVI) { location.href = URL_SERVEUR + "pages/" + O.id + ".html"; return; }
+  const items = aCompleter();
+  $("dlg-claude-titre").textContent = O.dossier ? "Compléter le dossier" : "Préparer le dossier";
+  $("dlg-claude-sous").textContent = O.dossier
+    ? (items.length ? `Réponds à ce que tu peux : Claude intègre tes réponses dans le dossier (et dans cv.md si c'est un fait nouveau). Laisse vide ce que tu ne sais pas. « non » = retirer la phrase.`
+                    : "Aucun [À COMPLÉTER] dans le dossier. Donne une consigne à Claude ci-dessous (ex : revoir la lettre).")
+    : "Claude prépare la fiche, le CV adapté, la lettre, les réponses aux formulaires et la checklist, en suivant CLAUDE.md. Compte quelques minutes.";
+  $("dlg-claude-champs").innerHTML = items.map((it, k) => `
+    <div class="q"><mark>[À COMPLÉTER : ${esc(it.question)}]</mark> <span class="ou">· ${esc(it.fichiers.join(", "))}</span></div>
+    <textarea data-q="${k}" placeholder="Ta réponse…"></textarea>`).join("");
+  $("dlg-claude-consignes").value = "";
+  $("dlg-claude").showModal();
+  $("dlg-claude").dataset.items = JSON.stringify(items.map((i) => i.question));
+}
+
+$("form-claude").addEventListener("submit", async (e) => {
+  if (e.submitter?.value !== "ok") return;
+  e.preventDefault();
+  const questions = JSON.parse($("dlg-claude").dataset.items || "[]");
+  const reponses = [...document.querySelectorAll("#dlg-claude-champs textarea")]
+    .map((ta) => ({ question: questions[+ta.dataset.q], reponse: ta.value.trim() })).filter((r) => r.reponse);
+  const consignes = $("dlg-claude-consignes").value.trim();
+  if (O.dossier && !reponses.length && !consignes) { toast("Écris au moins une réponse ou une consigne"); return; }
+  $("dlg-claude-ok").disabled = true;
+  try {
+    const res = await api("/api/completer", { id: O.id, reponses, consignes });
+    $("dlg-claude").close();
+    afficherTache(res.tache); suivreTache();
+  } catch (err) { if (err.message !== "redirection") toast("Échec : " + err.message); }
+  finally { $("dlg-claude-ok").disabled = false; }
+});
+
+const heure = (s) => (s || "").slice(11, 16);
+function afficherTache(t) {
+  const el = $("tache");
+  if (!t || t.etat === "aucune") { el.hidden = true; return; }
+  let masque = "";
+  try { masque = localStorage.getItem("tache-masquee-" + O.id) || ""; } catch {}
+  if (t.etat !== "en_cours" && masque === t.fin) { el.hidden = true; return; }
+  const quoi = t.mode === "preparer" ? "prépare le dossier" : "complète le dossier";
+  el.className = "tache " + t.etat; el.hidden = false;
+  if (t.etat === "en_cours") {
+    el.innerHTML = `<div class="tache-tete"><span><span class="rond"></span><b>Claude ${quoi}…</b> depuis ${esc(heure(t.debut))}. Compte quelques minutes ; tu peux fermer la page.</span></div>`;
+  } else {
+    const ok = t.etat === "termine";
+    el.innerHTML = `<div class="tache-tete"><span><b>${ok ? "✓ Claude a terminé" : "✗ Claude s'est arrêté sur une erreur"}</b> à ${esc(heure(t.fin))}${t.remarque ? " (" + esc(t.remarque) + ")" : ""}.</span>
+      <span><button class="btn petit primaire" data-act="recharger">Recharger la page</button> <button class="btn petit" data-act="masquer-tache">Masquer</button></span></div>
+      ${t.journal ? `<pre>${esc(t.journal.trim())}</pre>` : ""}`;
+  }
+}
+let suivi = null;
+async function lireTache() {
+  try { const r = await fetch("/api/tache?id=" + O.id); const t = await r.json(); return t.ok ? t : null; } catch { return null; }
+}
+function suivreTache() {
+  clearInterval(suivi);
+  suivi = setInterval(async () => {
+    const t = await lireTache(); if (!t) return;
+    afficherTache(t);
+    if (t.etat !== "en_cours") { clearInterval(suivi); toast(t.etat === "termine" ? "Claude a terminé : recharge la page" : "Claude s'est arrêté sur une erreur"); }
+  }, 4000);
+}
+document.addEventListener("click", (e) => {
+  const act = e.target.closest("[data-act]")?.dataset.act;
+  if (act === "recharger") location.reload();
+  else if (act === "masquer-tache") lireTache().then((t) => { try { localStorage.setItem("tache-masquee-" + O.id, t?.fin || ""); } catch {} $("tache").hidden = true; });
+});
+
+// ---------------------------------------------------------------- événements
+document.addEventListener("click", async (e) => {
+  const og = e.target.closest("[data-onglet]");
+  if (og) { onglet = og.dataset.onglet; history.replaceState(null, "", "#" + onglet); rendreContenu(); return; }
+  const cp = e.target.closest("[data-copier]");
+  if (cp) { copier(JSON.parse($("contenu").dataset.sections)[+cp.dataset.copier]); return; }
+  const rp = e.target.closest("[data-rapide]");
+  if (rp) {
+    const s = rp.dataset.rapide;
+    if (s === "ecartee" && !confirm("Écarter cette offre ?")) return;
+    changerStatut(s, $("f-note").value.trim() || null, $("f-action").value.trim() !== (O.prochaine_action || "") ? $("f-action").value.trim() : undefined);
+    return;
+  }
+  const act = e.target.closest("[data-act]")?.dataset.act;
+  if (!act) return;
+  if (act === "cv-pdf") imprimerCV();
+  else if (act === "copier-lettre") copier(texteBrut(D.textes["lettre.md"]));
+  else if (act === "modifier-lettre") {
+    if (!SERVI) { location.href = URL_SERVEUR + "pages/" + O.id + ".html#lettre"; return; }
+    editionLettre = true; brouillonLettre = null; rendreContenu();
+  }
+  else if (act === "annuler-lettre") {
+    if (brouillonLettre !== null && brouillonLettre !== D.textes["lettre.md"] && !confirm("Abandonner les modifications ?")) return;
+    editionLettre = false; brouillonLettre = null; rendreContenu();
+  }
+  else if (act === "exporter-lettre") {
+    const bouton = e.target.closest("button"); bouton.disabled = true;
+    const fenetre = window.open("", "_blank");  // ouverte tout de suite pour ne pas être bloquée par le navigateur
+    try {
+      const res = await api("/api/lettre", { id: O.id, texte: $("editeur-lettre").value });
+      D.textes["lettre.md"] = res.texte;
+      if (!O.fichiers.includes("lettre.pdf")) O.fichiers.push("lettre.pdf");
+      versionPdf = Date.now();
+      editionLettre = false; brouillonLettre = null; rendreContenu();
+      const url = fichierUrl("lettre.pdf") + "?v=" + versionPdf;
+      if (fenetre) fenetre.location.href = url; else window.open(url, "_blank");
+      toast("Lettre enregistrée, PDF régénéré");
+    } catch (err) {
+      if (fenetre) fenetre.close();
+      bouton.disabled = false;
+      if (err.message !== "redirection") toast("Échec : " + err.message);
+    }
+  }
+  else if (act === "copier-cv") copier(texteBrut(D.textes["cv.md"]));
+  else if (act === "copier-mail") copier(texteBrut(D.textes["mail.md"]));
+  else if (act === "claude") ouvrirClaude();
+  else if (act === "copier-desc") copier(D.description);
+  else if (act === "demande") copier(`Prépare le dossier ${O.id}`);
+  else if (act === "copier-linkedin") copier(sectionReponses(/linkedin/i));
+  else if (act === "copier-email") copier(sectionReponses(/^e-mail/i));
+  else if (act === "id") copier(O.id);
+  else if (act === "finder") { try { await api("/api/ouvrir", { id: O.id }); toast("Dossier ouvert"); } catch (err) { if (err.message !== "redirection") toast("Échec : " + err.message); } }
+});
+
+document.addEventListener("change", async (e) => {
+  const cb = e.target.closest("input[data-ligne]");
+  if (!cb) return;
+  const coche = cb.checked;
+  cb.disabled = true;
+  try {
+    const res = await api("/api/checklist", { id: O.id, ligne: +cb.dataset.ligne, coche });
+    D.textes["checklist.md"] = res.texte;
+    const cases = res.texte.split("\n").filter((l) => /^\s*[-*] \[[ xX]\]/.test(l));
+    O.checklist = [cases.filter((l) => /\[[xX]\]/.test(l)).length, cases.length];
+    rendreContenu();
+    toast(coche ? "Étape cochée" : "Étape décochée");
+  } catch (err) {
+    cb.checked = !coche; cb.disabled = false;
+    if (err.message !== "redirection") toast("Échec : " + err.message);
+  }
+});
+
+$("f-ok").onclick = () => changerStatut($("f-statut").value, $("f-note").value.trim() || null, $("f-action").value.trim());
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest("input, textarea, select") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "ArrowLeft" && !$("prec").hidden) location.href = $("prec").href;
+  else if (e.key === "ArrowRight" && !$("suiv").hidden) location.href = $("suiv").href;
+  else if (e.key === "Escape") location.href = D.retour || "../tableau_de_bord.html";
+  else if (/^[1-7]$/.test(e.key)) { const o = dispo()[+e.key - 1]; if (o) { onglet = o[0]; history.replaceState(null, "", "#" + onglet); rendreContenu(); } }
+});
+
+// ---------------------------------------------------------------- démarrage
+$("bandeau").hidden = SERVI;
+$("lien-serveur").href = URL_SERVEUR + "pages/" + O.id + ".html";
+if (D.retour) $("retour").href = D.retour;
+$("f-statut").innerHTML = Object.entries(D.statuts).map(([k, v]) => `<option value="${esc(k)}">${esc(k.replace("_", " "))} : ${esc(v)}</option>`).join("");
+const pos = D.ordre.findIndex((o) => o.id === O.id);
+[["prec", D.ordre[pos - 1]], ["suiv", D.ordre[pos + 1]]].forEach(([id, o]) => {
+  if (!o) return;
+  $(id).hidden = false; $(id).href = o.id + ".html"; $(id).title = `${o.entreprise} · ${o.titre}`;
+});
+onglet = location.hash.slice(1) || null;
+rendreEntete(); rendreSuivi(); rendreContenu();
+if (SERVI) lireTache().then((t) => { afficherTache(t); if (t && t.etat === "en_cours") suivreTache(); });
+</script>
+</body>
+</html>
